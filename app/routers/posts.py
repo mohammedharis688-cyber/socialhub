@@ -14,6 +14,7 @@ from app.services.telegram_service import (
 from app.providers.provider_registry import (
     get_provider
 )
+from app.models import SocialAccount
 import uuid
 import shutil
 import os
@@ -126,7 +127,55 @@ def upload_file(
         "media_type": media.media_type,
         "file_url": media.file_url
     }
+@router.post("/{post_id}/publish-all")
+def publish_all(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
 
+    post = (
+        db.query(Post)
+        .filter(
+            Post.id == post_id,
+            Post.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not post:
+        return {
+            "error": "Post not found"
+        }
+
+    accounts = (
+        db.query(SocialAccount)
+        .filter(
+            SocialAccount.user_id == current_user.id
+        )
+        .all()
+    )
+
+    published_to = []
+
+    for account in accounts:
+
+        provider = get_provider(
+            account.platform
+        )
+
+        if provider:
+
+            provider.publish(post)
+
+            published_to.append(
+                account.platform
+            )
+
+    return {
+        "message": "Published successfully",
+        "platforms": published_to
+    }
 @router.post("/{post_id}/publish/{platform}")
 def publish_post(
     post_id: int,
@@ -159,3 +208,4 @@ def publish_post(
         }
 
     return provider.publish(post)
+
