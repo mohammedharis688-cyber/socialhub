@@ -11,6 +11,9 @@ from app.services.telegram_service import (
     send_document,
     send_photo
 )
+from app.providers.provider_registry import (
+    get_provider
+)
 import uuid
 import shutil
 import os
@@ -124,11 +127,12 @@ def upload_file(
         "file_url": media.file_url
     }
 
-@router.post("/{post_id}/publish/telegram")
-def publish_to_telegram(
+@router.post("/{post_id}/publish/{platform}")
+def publish_post(
     post_id: int,
+    platform: str,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
 
     post = (
@@ -139,29 +143,19 @@ def publish_to_telegram(
         )
         .first()
     )
-    
 
     if not post:
         return {
             "error": "Post not found"
         }
 
-    send_message(post.content)
+    provider = get_provider(
+        platform
+    )
 
-    for media in post.media:
+    if not provider:
+        return {
+            "error": "Platform not supported"
+        }
 
-        if media.media_type == "document":
-
-            send_document(
-                media.file_url
-            )
-
-        elif media.media_type == "image":
-
-            send_photo(
-                media.file_url
-            )
-
-    return {
-    "message": "Published to Telegram"
-}
+    return provider.publish(post)
