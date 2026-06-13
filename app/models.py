@@ -53,8 +53,8 @@ class SocialAccount(Base):
     )
 
     access_token = Column(
-    String(2000),
-    nullable=False
+        String(2000),
+        nullable=False
     )
 
     refresh_token = Column(
@@ -62,6 +62,15 @@ class SocialAccount(Base):
         nullable=True
     )
 
+    platform_user_id = Column(
+        String(255),
+        nullable=True
+    )
+
+    platform_username = Column(
+        String(255),
+        nullable=True
+    )
 
 class Post(Base):
     __tablename__ = "posts"

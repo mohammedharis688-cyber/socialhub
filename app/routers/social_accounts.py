@@ -62,4 +62,10 @@ def get_connected_accounts(
         .all()
     )
 
-    return accounts
+    return [
+        {
+            "platform": account.platform,
+            "connected": True
+        }
+        for account in accounts
+    ]

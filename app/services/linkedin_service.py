@@ -59,7 +59,23 @@ def get_profile(access_token: str):
 
     return response.json()
 
+def get_userinfo(access_token: str):
 
+    url = "https://api.linkedin.com/v2/userinfo"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    response = requests.get(
+        url,
+        headers=headers
+    )
+
+    return {
+        "status_code": response.status_code,
+        "response": response.json()
+    }
 
 
 def decode_id_token(id_token: str):
