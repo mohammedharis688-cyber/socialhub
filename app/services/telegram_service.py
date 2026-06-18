@@ -8,57 +8,75 @@ BOT_TOKEN = TELEGRAM_BOT_TOKEN
 CHAT_ID = TELEGRAM_CHAT_ID
 
 def send_message(text: str):
+    try:
+        url = (
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        )
 
-    url = (
-        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    )
+        payload = {
+            "chat_id": CHAT_ID,
+            "text": text
+        }
 
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text
-    }
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=10
+        )
 
-    response = requests.post(
-        url,
-        json=payload
-    )
+        return response.json()
+    except Exception as e:
 
-    return response.json()
+        return {
+            "error": str(e)
+        }
 def send_document(file_path: str):
-
-    url = (
-        f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
-    )
-
-    with open(file_path, "rb") as document:
-
-        response = requests.post(
-            url,
-            data={
-                "chat_id": CHAT_ID
-            },
-            files={
-                "document": document
-            }
+    try:
+        url = (
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
         )
 
-    return response.json()
+        with open(file_path, "rb") as document:
+
+            response = requests.post(
+                url,
+                data={
+                    "chat_id": CHAT_ID
+                },
+                files={
+                    "document": document
+                },
+                timeout=10
+            )
+
+        return response.json()
+    except Exception as e:
+
+        return {
+            "error": str(e)
+        }
 def send_photo(file_path: str):
-
-    url = (
-        f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
-    )
-
-    with open(file_path, "rb") as photo:
-
-        response = requests.post(
-            url,
-            data={
-                "chat_id": CHAT_ID
-            },
-            files={
-                "photo": photo
-            }
+    try:
+        url = (
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
         )
 
-    return response.json()
+        with open(file_path, "rb") as photo:
+
+            response = requests.post(
+                url,
+                data={
+                    "chat_id": CHAT_ID
+                },
+                files={
+                    "photo": photo
+                },
+                timeout=10
+            )
+
+        return response.json()
+    except Exception as e:
+
+        return {
+            "error": str(e)
+        }

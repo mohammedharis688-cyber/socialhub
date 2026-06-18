@@ -156,7 +156,7 @@ def publish_all(
         .all()
     )
 
-    published_to = []
+    results = {}
 
     for account in accounts:
 
@@ -166,15 +166,20 @@ def publish_all(
 
         if provider:
 
-            provider.publish(post)
+            try:
 
-            published_to.append(
-                account.platform
-            )
+                results[account.platform] = (
+                    provider.publish(post)
+                )
 
+            except Exception as e:
+
+                results[account.platform] = {
+                    "error": str(e)
+                }
     return {
-        "message": "Published successfully",
-        "platforms": published_to
+        "message": "Publishing completed",
+        "results": results
     }
 @router.post("/{post_id}/publish/{platform}")
 def publish_post(
